@@ -16,6 +16,8 @@ class CustomUserSerializer(UserSerializer):
 
 
 class BalanceSerializer(serializers.ModelSerializer):
+    """Сериализатор баланса."""
+    # TODO
     class Meta:
         model = Balance
         fields = '__all__'
@@ -23,14 +25,16 @@ class BalanceSerializer(serializers.ModelSerializer):
 
 
 class BalanceUpdateSerializer(serializers.Serializer):
+    """Сериализатор добаления бонусов балансу пользователя."""
+    # TODO
     amount_to_add = serializers.IntegerField(min_value=1)
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
-    """Сериализатор подписки. задание 2.3"""
+    """Сериализатор подписки."""
+    # TODO
     user = serializers.StringRelatedField(read_only=True)
     course = serializers.StringRelatedField(read_only=True)
-    # TODO
 
     class Meta:
         model = Subscription

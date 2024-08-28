@@ -4,7 +4,6 @@ from users.models import Subscription
 
 class IsStudentOrIsAdmin(BasePermission):
     def has_permission(self, request, view):
-        """ задание 1.2"""
         # TODO
         course_id = view.kwargs.get("course_id")
 

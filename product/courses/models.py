@@ -3,8 +3,8 @@ from django.contrib.auth import get_user_model
 
 
 class Course(models.Model):
-    """Модель продукта - курса. задание 1.1 готово"""
-
+    """Модель продукта - курса."""
+    # TODO
     author = models.CharField(
         max_length=250,
         verbose_name='Автор',
@@ -22,7 +22,6 @@ class Course(models.Model):
     availability = models.BooleanField(
         default=True
     )
-    # TODO
 
     class Meta:
         verbose_name = 'Курс'
@@ -34,8 +33,8 @@ class Course(models.Model):
 
 
 class Lesson(models.Model):
-    """Модель урока. задание 1.3"""
-
+    """Модель урока."""
+    # TODO
     title = models.CharField(
         max_length=250,
         verbose_name='Название',
@@ -49,7 +48,6 @@ class Lesson(models.Model):
         on_delete=models.CASCADE,
         related_name='lessons',
     )
-    # TODO
 
     class Meta:
         verbose_name = 'Урок'
@@ -62,6 +60,7 @@ class Lesson(models.Model):
 
 class Group(models.Model):
     """Модель группы."""
+    # TODO
     course = models.ForeignKey(
         Course,
         on_delete=models.CASCADE,
@@ -85,7 +84,7 @@ class Group(models.Model):
 
     def __str__(self):
         return f"{self.course.name} - {self.name}"
-    # TODO
+
 
     class Meta:
         verbose_name = 'Группа'
@@ -94,6 +93,10 @@ class Group(models.Model):
 
 
 class GroupMembership(models.Model):
+    """
+    Промежуточная модель, которая связывает студента и группу курса
+    """
+    # TODO
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE

@@ -6,11 +6,15 @@ from .models import Course, Group, GroupMembership
 
 @receiver(post_save, sender=Course)
 def create_groups(sender, instance, created, **kwargs):
+    """
+    Автоматическое создание 10 пустых групп для нового курса.
+    """
+    # TODO
     if created:
         for i in range(10):
             Group.objects.create(
                 course=instance,
-                name=f"Группа {i+1}",
+                name=f"Группа {i + 1}",
                 max_students=30,
                 available_seats=30,
             )
@@ -19,9 +23,10 @@ def create_groups(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Subscription)
 def post_save_subscription(sender, instance: Subscription, created, **kwargs):
     """
-    Распределение нового студента в группу курса задание2.3.
+    Распределение нового студента в группу курса.
 
     """
+    # TODO
     if created:
         user = instance.user
         course = instance.course
@@ -47,12 +52,15 @@ def post_save_subscription(sender, instance: Subscription, created, **kwargs):
             new_group.users.add(user)
         instance.save()
 
-    # TODO
-
 
 @receiver(post_save, sender=GroupMembership)
 @receiver(post_delete, sender=GroupMembership)
 def update_available_seats(sender, instance, **kwargs):
+    """
+    Автоматичсекое обновление свободных мест в группах курса, с помощью
+    промежуточной модели GroupMembership
+    """
+    # TODO
     group = instance.group
     max_students = group.max_students
     group_membership_set = group.groupmembership_set.count()

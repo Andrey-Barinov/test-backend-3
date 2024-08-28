@@ -70,7 +70,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         permission_classes=(permissions.IsAuthenticated,)
     )
     def pay(self, request, pk):
-        """Покупка доступа к курсу (подписка на курс). задание 2.2"""
+        """Покупка доступа к курсу"""
         # TODO
         user = request.user
         course = get_object_or_404(Course, id=pk)
@@ -100,6 +100,8 @@ class CourseViewSet(viewsets.ModelViewSet):
         permission_classes=(permissions.IsAuthenticated,)
     )
     def available_courses(self, request):
+        """Доступные для покупки курсы"""
+        # TODO
         query_set = self.get_queryset()
 
         filtered_queryset = query_set.filter(

@@ -47,7 +47,6 @@ class StudentSerializer(serializers.ModelSerializer):
 
 class GroupSerializer(serializers.ModelSerializer):
     """Список групп."""
-
     # TODO Доп. задание
 
     course = serializers.StringRelatedField(read_only=True)
@@ -90,39 +89,49 @@ class CourseSerializer(serializers.ModelSerializer):
 
     def get_lessons_count(self, obj):
         """Количество уроков в курсе."""
-        return obj.lessons.count()
         # TODO Доп. задание
+        return obj.lessons.count()
+
 
     def get_students_count(self, obj):
         """Общее количество студентов на курсе."""
+        # TODO Доп. задание
+
         total_students_by_available_seats = (
             obj.groups.aggregate(
                 total_students=Sum('max_students') - Sum('available_seats')
             )['total_students'] or 0
         )
+
         return total_students_by_available_seats
-        # TODO Доп. задание
 
     def get_groups_filled_percent(self, obj):
         """Процент заполнения групп, если в группе максимум 30 чел.."""
+        # TODO Доп. задание
         groups = obj.groups.all()
-        total_seats = sum(group.available_seats for group in groups)
+
+        total_seats = sum(
+            group.available_seats for group in groups
+        )
         occupied_seats = sum(
             group.available_seats - group.students.count() for group in groups
         )
+
         if total_seats == 0:
             return 0
+
         return (occupied_seats / total_seats) * 100
-        # TODO Доп. задание
 
     def get_demand_course_percent(self, obj):
         """Процент приобретения курса."""
+        # TODO Доп. задание
         total_users = User.objects.count()
+
         course_subscriptions = Subscription.objects.filter(course=obj).count()
         if total_users == 0 or course_subscriptions == 0:
             return 0
+
         return (course_subscriptions / total_users) * 100
-        # TODO Доп. задание
 
     class Meta:
         model = Course
@@ -150,4 +159,5 @@ class CreateCourseSerializer(serializers.ModelSerializer):
             'author',
             'title',
             'start_date',
-            'cost',)
+            'cost',
+        )

@@ -33,7 +33,8 @@ class CustomUser(AbstractUser):
 
 
 class Balance(models.Model):
-    """Модель баланса пользователя. задание 4"""
+    """Модель баланса пользователя."""
+    # TODO
     user = models.OneToOneField(
         CustomUser,
         on_delete=models.CASCADE,
@@ -42,7 +43,6 @@ class Balance(models.Model):
     amount = models.PositiveIntegerField(
         default=1000
     )
-    # TODO
 
     class Meta:
         verbose_name = 'Баланс'
@@ -54,7 +54,8 @@ class Balance(models.Model):
 
 
 class Subscription(models.Model):
-    """Модель подписки пользователя на курс. задание 2?"""
+    """Модель подписки пользователя на курс."""
+    # TODO
     user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
@@ -66,7 +67,6 @@ class Subscription(models.Model):
     purchase_date = models.DateTimeField(
         auto_now=True
     )
-    # TODO
 
     class Meta:
         unique_together = ('user', 'course')

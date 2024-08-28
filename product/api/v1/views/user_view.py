@@ -24,7 +24,7 @@ class BalanceViewSet(mixins.ListModelMixin,
                      mixins.RetrieveModelMixin,
                      viewsets.GenericViewSet):
     permission_classes = (permissions.IsAdminUser,)
-
+    # TODO
     def get_queryset(self):
         return Balance.objects.all()
 
@@ -34,7 +34,6 @@ class BalanceViewSet(mixins.ListModelMixin,
         return BalanceSerializer
 
     def get_object(self):
-        # Получаем объект по pk баланса
         queryset = self.get_queryset()
         balance_id = self.kwargs.get('pk')
         obj = get_object_or_404(queryset, pk=balance_id)
