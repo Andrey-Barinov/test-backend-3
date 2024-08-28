@@ -10,9 +10,9 @@ from api.v1.serializers.course_serializer import (CourseSerializer,
                                                   CreateLessonSerializer,
                                                   GroupSerializer,
                                                   LessonSerializer)
-from api.v1.serializers.user_serializer import SubscriptionSerializer
 from courses.models import Course
-from users.models import Subscription
+from users.models import Subscription, Balance
+from django.utils import timezone
 
 
 class LessonViewSet(viewsets.ModelViewSet):
@@ -60,7 +60,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     permission_classes = (ReadOnlyOrIsAdmin,)
 
     def get_serializer_class(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ['list', 'retrieve', 'pay', 'available_courses']:
             return CourseSerializer
         return CreateCourseSerializer
 
@@ -70,11 +70,49 @@ class CourseViewSet(viewsets.ModelViewSet):
         permission_classes=(permissions.IsAuthenticated,)
     )
     def pay(self, request, pk):
-        """Покупка доступа к курсу (подписка на курс)."""
-
+        """Покупка доступа к курсу (подписка на курс). задание 2.2"""
         # TODO
+        user = request.user
+        course = get_object_or_404(Course, id=pk)
+        serializer = self.get_serializer(course)
+        balance = Balance.objects.get(user=user)
+        data = serializer.data
+
+        if balance.amount < data['cost']:
+            return Response(
+                data={"error": "Недостаточно средств!"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        balance.amount -= data['cost']
+        balance.save()
+
+        Subscription.objects.create(user_id=user.pk, course_id=data['id'])
 
         return Response(
             data=data,
             status=status.HTTP_201_CREATED
+        )
+
+    @action(
+        methods=['get'],
+        detail=False,
+        permission_classes=(permissions.IsAuthenticated,)
+    )
+    def available_courses(self, request):
+        query_set = self.get_queryset()
+
+        filtered_queryset = query_set.filter(
+            start_date__gte=timezone.now()).filter(availability=True)
+
+        not_subscribed = filtered_queryset.exclude(
+            id__in=Subscription.objects.filter(
+                user=request.user).values('course_id')
+        )
+
+        serializer = self.get_serializer(not_subscribed, many=True)
+
+        return Response(
+            data=serializer.data,
+            status=status.HTTP_200_OK
         )

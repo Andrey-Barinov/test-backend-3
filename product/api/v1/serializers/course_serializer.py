@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Avg, Count
+from django.db.models import Sum
 from rest_framework import serializers
-
 from courses.models import Course, Group, Lesson
 from users.models import Subscription
 
@@ -51,8 +50,12 @@ class GroupSerializer(serializers.ModelSerializer):
 
     # TODO Доп. задание
 
+    course = serializers.StringRelatedField(read_only=True)
+    students = StudentSerializer(many=True, read_only=True)
+
     class Meta:
         model = Group
+        fields = ['name', 'course', 'students']
 
 
 class CreateGroupSerializer(serializers.ModelSerializer):
@@ -87,18 +90,38 @@ class CourseSerializer(serializers.ModelSerializer):
 
     def get_lessons_count(self, obj):
         """Количество уроков в курсе."""
+        return obj.lessons.count()
         # TODO Доп. задание
 
     def get_students_count(self, obj):
         """Общее количество студентов на курсе."""
+        total_students_by_available_seats = (
+            obj.groups.aggregate(
+                total_students=Sum('max_students') - Sum('available_seats')
+            )['total_students'] or 0
+        )
+        return total_students_by_available_seats
         # TODO Доп. задание
 
     def get_groups_filled_percent(self, obj):
         """Процент заполнения групп, если в группе максимум 30 чел.."""
+        groups = obj.groups.all()
+        total_seats = sum(group.available_seats for group in groups)
+        occupied_seats = sum(
+            group.available_seats - group.students.count() for group in groups
+        )
+        if total_seats == 0:
+            return 0
+        return (occupied_seats / total_seats) * 100
         # TODO Доп. задание
 
     def get_demand_course_percent(self, obj):
         """Процент приобретения курса."""
+        total_users = User.objects.count()
+        course_subscriptions = Subscription.objects.filter(course=obj).count()
+        if total_users == 0 or course_subscriptions == 0:
+            return 0
+        return (course_subscriptions / total_users) * 100
         # TODO Доп. задание
 
     class Meta:
@@ -108,12 +131,13 @@ class CourseSerializer(serializers.ModelSerializer):
             'author',
             'title',
             'start_date',
-            'price',
+            'cost',
             'lessons_count',
             'lessons',
             'demand_course_percent',
             'students_count',
             'groups_filled_percent',
+            'availability'
         )
 
 
@@ -122,3 +146,8 @@ class CreateCourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
+        fields = (
+            'author',
+            'title',
+            'start_date',
+            'cost',)

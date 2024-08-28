@@ -2,19 +2,24 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 from users.models import Subscription
 
 
-def make_payment(request):
-    # TODO
-    pass
-
-
 class IsStudentOrIsAdmin(BasePermission):
     def has_permission(self, request, view):
+        """ задание 1.2"""
         # TODO
-        pass
+        course_id = view.kwargs.get("course_id")
+
+        access = Subscription.objects.filter(
+            user=request.user, course_id=course_id).exists()
+        return access or request.user.is_staff
 
     def has_object_permission(self, request, view, obj):
         # TODO
-        pass
+        course_id = view.kwargs.get("course_id")
+
+        access = Subscription.objects.filter(
+            user=request.user, course_id=course_id).exists()
+
+        return access or request.user.is_staff
 
 
 class ReadOnlyOrIsAdmin(BasePermission):
